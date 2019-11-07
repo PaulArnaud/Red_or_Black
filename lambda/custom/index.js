@@ -149,28 +149,30 @@ const SetNbPlayerHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SetNbPlayerIntent';
     },
     handle(handlerInput) {
-        const speakOutput = handlerInput.requestEnvelope.request.intent.slots.number.value;
-        const sentence = "The game is launched with " + speakOutput + " players";
-        //handlerInput.attributesManager.setRequestAttributes({nbPlayers: speakOutput});
+        const nbPlayers = handlerInput.requestEnvelope.request.intent.slots.number.value;
+        const sentence = "The game is launched with " + nbPlayers + " players";
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        sessionAttributes.numberOfPlayer = nbPlayers
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
             .speak(sentence)
-            .reprompt('What\'s the first player name ?')
+            .reprompt("What\'s the first player name ?")
             .getResponse();
     }
 };
+/*
+Be careful, you have to order 
+*/
 
- exports.handler = Alexa.SkillBuilders.custom()
+exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
+        SetNbPlayerHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         FallbackIntentHandler,
-        SessionEndedRequestHandler,
-        IntentReflectorHandler)/*,
-        SetNbPlayerHandler*/
-    .addErrorHandlers(
-        ErrorHandler)
-    .addRequestInterceptors(
-        LocalisationRequestInterceptor)
+        SessionEndedRequestHandler)
+    .addErrorHandlers(ErrorHandler)
+    .addRequestInterceptors(LocalisationRequestInterceptor)
     .withCustomUserAgent('sample/hello-world/v1.2')
     .lambda();
