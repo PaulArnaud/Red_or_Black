@@ -142,6 +142,7 @@ const LocalisationRequestInterceptor = {
  * defined are included below. The order matters - they're processed top to bottom 
  * */
 
+
 /* OUR WORK */
 const SetNbPlayerHandler = {
     canHandle(handlerInput) {
@@ -152,7 +153,9 @@ const SetNbPlayerHandler = {
         const nbPlayers = handlerInput.requestEnvelope.request.intent.slots.number.value;
         const sentence = "The game is launched with " + nbPlayers + " players";
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        sessionAttributes.numberOfPlayer = nbPlayers
+        sessionAttributes.numberOfPlayer = nbPlayers;
+        sessionAttributes.playersList = [];
+        sessionAttributes.currentPlayer = 1;
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
             .speak(sentence)
@@ -160,6 +163,35 @@ const SetNbPlayerHandler = {
             .getResponse();
     }
 };
+
+const SetNamePlayerIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' 
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SetNamePlayerIntent';
+    },
+    handle(handlerInput) {
+        const playerName = handlerInput.requestEnvelope.request.intent.slots.name.value;
+        const sentence = "The player name is " + playerName;
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+
+        sessionAttributes.playersList.push({key: sessionAttributes.currentPlayer, value: playerName});
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+        if (sessionAttributes.currentPlayer <= parseInt(sessionAttributes.nbPlayers)) {
+            return handlerInput.responseBuilder
+                .speak(sentence)
+                .reprompt("What\'s the player name ?")
+                .getResponse();
+        } else {
+            return handlerInput.responseBuilder
+                .speak(sentence)
+                .reprompt("Red or Black")
+                .getResponse();
+        }
+    }
+};
+
 /*
 Be careful, you have to order 
 */
@@ -168,6 +200,7 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         SetNbPlayerHandler,
+        SetNamePlayerIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         FallbackIntentHandler,
