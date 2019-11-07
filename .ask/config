@@ -1,0 +1,75 @@
+{
+  "deploy_settings": {
+    "default": {
+      "skill_id": "amzn1.ask.skill.ac3ea225-b3ee-44fe-bd69-0d0e1bd98974",
+      "was_cloned": false,
+      "merge": {},
+      "resources": {
+        "manifest": {
+          "eTag": "14a5834c6fc1341c801569e4b3952a4c"
+        },
+        "interactionModel": {
+          "de-DE": {
+            "eTag": "8c1453fc8eccaa394cc4c5d97fa97c93"
+          },
+          "en-AU": {
+            "eTag": "186fddd689e3cf85537a4e72387b0e35"
+          },
+          "en-GB": {
+            "eTag": "a0fcbf7815293f9350115d8c57753af9"
+          },
+          "en-US": {
+            "eTag": "e4d6ca67ba02f962ce8ae6a5a65a37fa"
+          },
+          "en-CA": {
+            "eTag": "ea0b98dd4250ecad43910f7e5378ce6e"
+          },
+          "es-ES": {
+            "eTag": "b16f3629b388911218123665d9e58884"
+          },
+          "es-US": {
+            "eTag": "239e615b827efae417e8773440cfa534"
+          },
+          "en-IN": {
+            "eTag": "48b04c39fd2faf72d08957e65c39749b"
+          },
+          "fr-CA": {
+            "eTag": "fabec94164f5e0c8d7e18672ba7047ba"
+          },
+          "hi-IN": {
+            "eTag": "87595314d36440d82d0ca0a0489cc252"
+          },
+          "ja-JP": {
+            "eTag": "d04f028b857867ce29b7332fe8467a7c"
+          },
+          "es-MX": {
+            "eTag": "f60708a539100f14bd7e79aab5377a3b"
+          },
+          "it-IT": {
+            "eTag": "22783a6f6cf80ab3d907d2a9e519cc4c"
+          },
+          "fr-FR": {
+            "eTag": "359f6af97929ec845b874111c098c8a9"
+          },
+          "pt-BR": {
+            "eTag": "b66229089a1ad44f83491409c527aa5f"
+          }
+        },
+        "lambda": [
+          {
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "arn": "arn:aws:lambda:us-east-1:133340048236:function:ask-custom-Red_or_Black-default",
+            "awsRegion": "us-east-1",
+            "codeUri": "lambda/custom",
+            "functionName": "ask-custom-Red_or_Black-default",
+            "handler": "index.handler",
+            "revisionId": "e7b48fb8-8107-4f19-a616-4bdb0a20ba8f",
+            "runtime": "nodejs8.10"
+          }
+        ]
+      }
+    }
+  }
+}

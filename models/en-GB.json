@@ -1,0 +1,118 @@
+{
+    "interactionModel": {
+      "languageModel": {
+        "invocationName": "red or black",
+        "intents": [
+          {
+            "name": "AMAZON.CancelIntent",
+            "samples": []
+          },
+          {
+            "name": "AMAZON.HelpIntent",
+            "samples": []
+          },
+          {
+            "name": "AMAZON.StopIntent",
+            "samples": []
+          },
+          {
+            "name": "SetNbPlayerIntent",
+            "slots": [
+              {
+                "name": "number",
+                "type": "AMAZON.NUMBER"
+              }
+            ],
+            "samples": [
+              "{number} players",
+              "{number}",
+              "we are {number} players",
+              "we are {number}"
+            ]
+          },
+          {
+            "name": "RedIntent",
+            "slots": [],
+            "samples": [
+              "red"
+            ]
+          },
+          {
+            "name": "BlackIntent",
+            "slots": [],
+            "samples": [
+              "black"
+            ]
+          },
+          {
+            "name": "InternIntent",
+            "slots": [],
+            "samples": [
+              "in"
+            ]
+          },
+          {
+            "name": "ExternIntent",
+            "slots": [],
+            "samples": [
+              "out"
+            ]
+          },
+          {
+            "name": "HigherIntent",
+            "slots": [],
+            "samples": [
+              "plus",
+              "superior",
+              "higher",
+              "better"
+            ]
+          },
+          {
+            "name": "BelowIntent",
+            "slots": [],
+            "samples": [
+              "less",
+              "inferior",
+              "minus"
+            ]
+          },
+          {
+            "name": "ClubsIntent",
+            "slots": [],
+            "samples": [
+              "club"
+            ]
+          },
+          {
+            "name": "DiamondsIntent",
+            "slots": [],
+            "samples": [
+              "diamond"
+            ]
+          },  
+          {
+            "name": "HeartsIntent",
+            "slots": [],
+            "samples": [
+              "heart"
+            ]
+          },  
+          {
+            "name": "SpadesIntent",
+            "slots": [],
+            "samples": [
+              "spade"
+            ]
+          },          
+          {
+            "name": "AMAZON.NavigateHomeIntent",
+            "samples": []
+          }
+        ],
+        "types": []
+      }
+    },
+    "version": "8"
+  }
+  
