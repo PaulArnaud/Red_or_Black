@@ -10,49 +10,49 @@
         },
         "interactionModel": {
           "de-DE": {
-            "eTag": "4b263fd6b5f3b62478e2e2085d15aa7a"
+            "eTag": "bb3e461e2e25bb1a97b2768d7a1c2547"
           },
           "en-AU": {
-            "eTag": "72ae7d142e412f7087127a7945b7942a"
+            "eTag": "7c71bfb9bf3218a186417192a25d0c52"
           },
           "en-GB": {
-            "eTag": "2a4d4b39f33966f91134c2ca03a969a6"
+            "eTag": "e80c1d4ee10e9ace769f131614aa728c"
           },
           "en-US": {
-            "eTag": "a8c5328dc2360d3bf97f0cc6890752b9"
+            "eTag": "9ca0ee17c912c48745442540ad73540e"
           },
           "en-CA": {
-            "eTag": "37cec2c4edfe6ef00051543fd2aea707"
+            "eTag": "6e6348ebf3b78171fd8d4a539c00e417"
           },
           "es-ES": {
-            "eTag": "1d9ecf959ad5a464af1ad4d86079d6a9"
+            "eTag": "41661456ee528593ed32b3a86d605e57"
           },
           "es-US": {
-            "eTag": "8eb04657071f67c84a913a6b5c6ab008"
+            "eTag": "d1ed2501f8ae756a69ff5f20a429769e"
           },
           "en-IN": {
-            "eTag": "10219f68675c382328a314c165b3c649"
+            "eTag": "0b541c36015c8f41d0aa20ca740f5c85"
           },
           "fr-CA": {
-            "eTag": "5cb7c77fbf4f321d05f3b677e549ba21"
+            "eTag": "3501fda4ed3ab67028fc879dfcf060d4"
           },
           "hi-IN": {
-            "eTag": "da1ccd4efe6ff61de844533b7764aa79"
+            "eTag": "6ab4372441c2e3e8b830020120ae6cb7"
           },
           "ja-JP": {
-            "eTag": "789e0be5172db3a0729ffd0e72e85456"
+            "eTag": "e55f4ebff154bba7679ca3335e5982e9"
           },
           "es-MX": {
-            "eTag": "5675a4f7dba7c252bd08a1b99f24a7ce"
+            "eTag": "62f4cde7495cb9f9ec026623ed66f93f"
           },
           "it-IT": {
-            "eTag": "c33b32787a6f757fbc785068d8199592"
+            "eTag": "e22b5edfcfded232fa16bbdb1c18b0d9"
           },
           "fr-FR": {
-            "eTag": "b4262db479bb1f28f69b4a8f0f60c635"
+            "eTag": "285956b71843c5f615ce2611299beb3c"
           },
           "pt-BR": {
-            "eTag": "a702609e03ac13d0c4a79de413cd0be9"
+            "eTag": "6dd6a352bc5c520929cd81003f245378"
           }
         },
         "lambda": [
@@ -65,7 +65,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-Red_or_Black-default",
             "handler": "index.handler",
-            "revisionId": "a5679c3d-6c6b-44c0-a1de-388700c349cb",
+            "revisionId": "c84f21cd-9aff-401e-bc86-25ceb7aa4543",
             "runtime": "nodejs8.10"
           }
         ]

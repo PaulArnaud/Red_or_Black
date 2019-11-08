@@ -307,31 +307,6 @@ const SetNamePlayerIntentHandler = {
 
     }
 };
-/*
-const RedIntentHandler = {
-    canHandle(handlerInput) {
-        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' 
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'RedIntent';
-    },
-    handle(handlerInput) {
-        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
-        if(!verif){
-            console.log("verif not valid")
-            return handlerInput.responseBuilder
-                .speak(errorMessage)
-                .reprompt()
-                .getResponse();
-        }
-
-        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-        return handlerInput.responseBuilder
-            .speak("aled")
-            .reprompt("aled")
-            .getResponse();
-
-    }
-};*/
 
 const RedIntentHandler = {
     canHandle(handlerInput) {
@@ -342,16 +317,13 @@ const RedIntentHandler = {
         const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
         if(!verif){
-            console.log("verif not valid")
             return handlerInput.responseBuilder
                 .speak(errorMessage)
                 .reprompt()
                 .getResponse();
         }
 
-        console.log("testCard: before draw")
         const card = sessionAttributes.deck.pop()
-        console.log("testCard: card" + card)
         const suit = card.suit
         const rank = card.rank
         var sentence = "You draw a " + rank + " of " + suit;
@@ -366,17 +338,61 @@ const RedIntentHandler = {
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
         if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
             sessionAttributes.currentPlayer = 0
-            sentence = sentence + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! IN or OUT?";
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! you have a " + sessionAttributes.playersList[0].rank + ", higher or below ?";
+        } else {
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! red or black?"
         }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
             .speak(sentence)
-            .reprompt("What\'s the player name ?")
+            .reprompt()
             .getResponse();
 
     }
 };
 
+const BlackIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' 
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'BlackIntent';
+    },
+    handle(handlerInput) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        const card = sessionAttributes.deck.pop()
+        const suit = card.suit
+        const rank = card.rank
+        var sentence = "You draw a " + rank + " of " + suit;
+        
+        if (suit == "spades" || suit == "clubs"){
+            sentence = sentence + ", you won !"
+        } else {
+            sentence = sentence + ", you lost !"
+        }
+
+        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+            sessionAttributes.currentPlayer = 0
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! you have a " + sessionAttributes.playersList[0].rank + ", higher or below ?";
+        } else {
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! red or black?"
+        }
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return handlerInput.responseBuilder
+            .speak(sentence)
+            .reprompt()
+            .getResponse();
+
+    }
+};
 
 /*
 Be careful, you have to order 
@@ -428,6 +444,7 @@ exports.handler = Alexa.SkillBuilders.custom()
         SetNbPlayerIntentHandler,
         SetNamePlayerIntentHandler,
         RedIntentHandler,
+        BlackIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         FallbackIntentHandler,
