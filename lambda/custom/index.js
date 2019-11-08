@@ -14,7 +14,7 @@ const compareIntents = ["HigherIntent", "BelowIntent"];
 const interExterIntents = ["InternIntent", "ExternIntent"];
 const suiteIntents = ["DiamondsIntent", "ClubsIntent", "SpadesIntent", "HeartsIntent"];
 
-const RESTART_MESSAGE = " Thanks for playing red or black, Good Bye";
+const RESTART_MESSAGE = " Thanks for playing to red or black, Good Bye";
 const WELCOME_MESSAGE = "Welcome in Red or Black! Please play moderatly to this game. How many player do you want ?";
 const NB_PLAYER_ERROR_MESSAGE = "The number of players has already been set";
 const NB_PLAYER_WRONG_ERROR_MESSAGE = "Please set a number of players between 1 and 13";
