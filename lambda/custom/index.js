@@ -9,12 +9,23 @@ const i18n = require('i18next');
 // i18n strings for all supported locales
 const languageStrings = require('./languageStrings');
 
+const colorIntents = ["RedIntent", "BlackIntent"];
+const compareIntents = ["HigherIntent", "BelowIntent"]
+const interExterIntents = ["InternIntent", "ExternIntent"]
+const suiteIntents = ["DiamondsIntent", "ClubsIntent", "SpadesIntent", "HeartsIntent"]
+
+const WELCOME_MESSAGE =  "Welcome in Red or Black! Please play moderatly to this game. How many player do you want"
+const NB_PLAYER_ERROR_MESSAGE = "The number of players has already been set"
+const NB_PLAYER_WRONG_ERROR_MESSAGE = "Please set a number a players between 1 and 13"
+
+const ADD_PLAYER_ERROR_MESSAGE = "You cannot add another player in the game"
+
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput) {
-        const speakOutput = handlerInput.t('WELCOME_MSG');
+        const speakOutput = WELCOME_MESSAGE;
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -150,9 +161,17 @@ const SetNbPlayerHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SetNbPlayerIntent';
     },
     handle(handlerInput) {
-        const nbPlayers = handlerInput.requestEnvelope.request.intent.slots.number.value;
-        const sentence = "The game is launched with " + nbPlayers + " players";
+        const nbPlayers = parseInt(handlerInput.requestEnvelope.request.intent.slots.number.value);
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope), nbPlayers)
+        if(!verif){
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        const sentence = "The game is launched with " + nbPlayers + " players, What\'s the name of the player one ?";
         sessionAttributes.numberOfPlayer = nbPlayers;
         sessionAttributes.playersList = [];
         sessionAttributes.currentPlayer = 1;
@@ -170,31 +189,72 @@ const SetNamePlayerIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SetNamePlayerIntent';
     },
     handle(handlerInput) {
-        const playerName = handlerInput.requestEnvelope.request.intent.slots.name.value;
-        const sentence = "The player name is " + playerName;
-        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-
-        sessionAttributes.playersList.push({key: sessionAttributes.currentPlayer, value: playerName});
-        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
-        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
-
-        if (sessionAttributes.currentPlayer <= parseInt(sessionAttributes.nbPlayers)) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
             return handlerInput.responseBuilder
-                .speak(sentence)
-                .reprompt("What\'s the player name ?")
-                .getResponse();
-        } else {
-            return handlerInput.responseBuilder
-                .speak(sentence)
-                .reprompt("Red or Black")
+                .speak(errorMessage)
+                .reprompt()
                 .getResponse();
         }
+
+        const playerName = handlerInput.requestEnvelope.request.intent.slots.name.value;
+
+        var sentence = "";
+               
+
+        sessionAttributes.playersList.push({key: sessionAttributes.currentPlayer, name: playerName, cards: []});
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        
+        if (sessionAttributes.playersList.length >= sessionAttributes.numberOfPlayer) {
+            sessionAttributes.currentPlayer = 0;
+            sentence = "The player name is " + playerName +". " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! red or black?";
+        } else {
+            sentence = "The player name is " + playerName + ", What\'s the next player name ?";
+        }
+        
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return handlerInput.responseBuilder
+            .speak(sentence)
+            .reprompt("What\'s the player name ?")
+            .getResponse();
+
     }
 };
 
 /*
 Be careful, you have to order 
 */
+
+function verifIntent(session, intent, parameter = undefined) {
+    if (colorIntents.includes(intent)){
+        return {verif: true, error: ""}
+    } else if (compareIntents.includes(intent)) {
+        return {verif: true, errorMessage: ""}
+    } else if (interExterIntents.includes(intent)){
+        return {verif: true, errorMessage: ""}
+    } else if (suiteIntents.includes(intent)) {
+        return {verif: true, errorMessage: ""}
+    } else if (intent == "SetNbPlayerIntent"){
+        if (session.numberOfPlayer){
+            return {verif: false, errorMessage: NB_PLAYER_ERROR_MESSAGE + " to " + session.numberOfPlayer}
+        } else if(parameter && parameter > 13){
+            return {verif: false, errorMessage: NB_PLAYER_WRONG_ERROR_MESSAGE}
+        } else {
+            return {verif: true, errorMessage: ""}
+        }
+    } else if (intent == "SetNamePlayerIntent"){
+        if (session.numberOfPlayer && session.playersList.length < session.numberOfPlayer) {
+            return {verif: true, errorMessage: ""}
+        } else if (!session.numberOfPlayer){
+            return {verif: false, errorMessage: NB_PLAYER_WRONG_ERROR_MESSAGE}
+        } else {
+            return {verif: false, errorMessage: ADD_PLAYER_ERROR_MESSAGE}
+        }
+    } else {
+        return {verif: true, errorMessage: ""}
+    }
+}
 
 exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
