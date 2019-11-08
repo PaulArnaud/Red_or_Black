@@ -424,7 +424,7 @@ const HigherIntentHandler = {
             sessionAttributes.currentPlayer = 0
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + " and a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank + ", in or out ?";
         } else {
-            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". higher or below ?"
+            sentence = sentence + " " + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + ", higher or below ?";
         }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
@@ -464,7 +464,7 @@ const BelowIntentHandler = {
             sessionAttributes.currentPlayer = 0
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + " and a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank + ", in or out ?";
         } else {
-            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". higher or below ?"
+            sentence = sentence + " " + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + ", higher or below ?";
         }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
