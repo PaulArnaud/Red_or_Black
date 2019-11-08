@@ -9,8 +9,6 @@ const i18n = require('i18next');
 // i18n strings for all supported locales
 const languageStrings = require('./languageStrings');
 
-const {decks} = require('cards');
-
 const colorIntents = ["RedIntent", "BlackIntent"];
 const compareIntents = ["HigherIntent", "BelowIntent"];
 const interExterIntents = ["InternIntent", "ExternIntent"];
@@ -45,6 +43,64 @@ const cardValue = new Map([
     ["Queen", 12],
     ["King", 13]
   ]);
+
+const DECK_52 = [
+    {rank: "Ace", suit: "spades"},
+    {rank: "Two", suit: "spades"},
+    {rank: "Three", suit: "spades"},
+    {rank: "Four", suit: "spades"},
+    {rank: "Five", suit: "spades"},
+    {rank: "Six", suit: "spades"},
+    {rank: "Seven", suit: "spades"},
+    {rank: "Eight", suit: "spades"},
+    {rank: "Nine", suit: "spades"},
+    {rank: "Ten", suit: "spades"},
+    {rank: "Jack", suit: "spades"},
+    {rank: "Queen", suit: "spades"},
+    {rank: "King", suit: "spades"},
+
+    {rank: "Ace", suit: "hearts"},
+    {rank: "Two", suit: "hearts"},
+    {rank: "Three", suit: "hearts"},
+    {rank: "Four", suit: "hearts"},
+    {rank: "Five", suit: "hearts"},
+    {rank: "Six", suit: "hearts"},
+    {rank: "Seven", suit: "hearts"},
+    {rank: "Eight", suit: "hearts"},
+    {rank: "Nine", suit: "hearts"},
+    {rank: "Ten", suit: "hearts"},
+    {rank: "Jack", suit: "hearts"},
+    {rank: "Queen", suit: "hearts"},
+    {rank: "King", suit: "hearts"},
+
+    {rank: "Ace", suit: "diamonds"},
+    {rank: "Two", suit: "diamonds"},
+    {rank: "Three", suit: "diamonds"},
+    {rank: "Four", suit: "diamonds"},
+    {rank: "Five", suit: "diamonds"},
+    {rank: "Six", suit: "diamonds"},
+    {rank: "Seven", suit: "diamonds"},
+    {rank: "Eight", suit: "diamonds"},
+    {rank: "Nine", suit: "diamonds"},
+    {rank: "Ten", suit: "diamonds"},
+    {rank: "Jack", suit: "diamonds"},
+    {rank: "Queen", suit: "diamonds"},
+    {rank: "King", suit: "diamonds"},
+
+    {rank: "Ace", suit: "clubs"},
+    {rank: "Two", suit: "clubs"},
+    {rank: "Three", suit: "clubs"},
+    {rank: "Four", suit: "clubs"},
+    {rank: "Five", suit: "clubs"},
+    {rank: "Six", suit: "clubs"},
+    {rank: "Seven", suit: "clubs"},
+    {rank: "Eight", suit: "clubs"},
+    {rank: "Nine", suit: "clubs"},
+    {rank: "Ten", suit: "clubs"},
+    {rank: "Jack", suit: "clubs"},
+    {rank: "Queen", suit: "clubs"},
+    {rank: "King", suit: "clubs"}
+]
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -197,8 +253,8 @@ const SetNbPlayerIntentHandler = {
                 .getResponse();
         }
 
-        const deck = new decks.StandardDeck();
-        deck.shuffleAll();
+        var deck = DECK_52
+        deck.sort(function (a, b) { return 0.5 - Math.random() })
         const sentence = "The game is launched with " + nbPlayers + " players, What\'s the name of the player one ?";
         sessionAttributes.numberOfPlayer = nbPlayers;
         sessionAttributes.playersList = [];
@@ -251,6 +307,31 @@ const SetNamePlayerIntentHandler = {
 
     }
 };
+/*
+const RedIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' 
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'RedIntent';
+    },
+    handle(handlerInput) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
+            console.log("verif not valid")
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return handlerInput.responseBuilder
+            .speak("aled")
+            .reprompt("aled")
+            .getResponse();
+
+    }
+};*/
 
 const RedIntentHandler = {
     canHandle(handlerInput) {
@@ -261,31 +342,32 @@ const RedIntentHandler = {
         const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
         let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
         if(!verif){
+            console.log("verif not valid")
             return handlerInput.responseBuilder
                 .speak(errorMessage)
                 .reprompt()
                 .getResponse();
         }
 
-        const cardDraw = sessionAttributes.deck.draw(1)[0]
-        const suit = cardDraw.suit.name
-        const rank = cardDraw.rank.longName
-        console.log("salut à tous" + cardDraw)
-        var sentence = "You draw a " + cardValue.get(rank) + " of " + suit;
-        /*
+        console.log("testCard: before draw")
+        const card = sessionAttributes.deck.pop()
+        console.log("testCard: card" + card)
+        const suit = card.suit
+        const rank = card.rank
+        var sentence = "You draw a " + rank + " of " + suit;
+        
         if (suit == "hearts" || suit == "diamonds"){
             sentence = sentence + ", you won !"
         } else {
             sentence = sentence + ", you lost !"
         }
 
-        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(cardDraw)
+        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
         if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
             sessionAttributes.currentPlayer = 0
             sentence = sentence + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! IN or OUT?";
-        }*/
-        
+        }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
             .speak(sentence)
@@ -301,13 +383,11 @@ Be careful, you have to order
 */
 
 function verifIntent(session, intent, parameter = undefined) {
-    const checkInPhase = () => {
-        return (session.numberOfPlayer && session.playersList.length == session.numberOfPlayer)
-    }
+    const checkInPhase = (session.numberOfPlayer && session.playersList.length == session.numberOfPlayer)
 
     if (colorIntents.includes(intent)){
         if (checkInPhase && session.playersList[session.currentPlayer].cards.length == 0){
-            return {verif: true, error: ""}
+            return {verif: true, errorMessage: ""}
         } else if (!session.numberOfPlayer){
             return {verif: false, errorMessage: NB_PLAYER_WRONG_ERROR_MESSAGE}
         } else if(session.numberOfPlayer && session.playersList.length < session.numberOfPlayer){
