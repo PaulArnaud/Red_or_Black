@@ -14,7 +14,8 @@ const compareIntents = ["HigherIntent", "BelowIntent"];
 const interExterIntents = ["InternIntent", "ExternIntent"];
 const suiteIntents = ["DiamondsIntent", "ClubsIntent", "SpadesIntent", "HeartsIntent"];
 
-const WELCOME_MESSAGE = "Welcome in Red or Black! Please play moderatly to this game. How many player do you want";
+const RESTART_MESSAGE = " Thanks for playing red or black, Good Bye";
+const WELCOME_MESSAGE = "Welcome in Red or Black! Please play moderatly to this game. How many player do you want ?";
 const NB_PLAYER_ERROR_MESSAGE = "The number of players has already been set";
 const NB_PLAYER_WRONG_ERROR_MESSAGE = "Please set a number of players between 1 and 13";
 const NOT_ENOUGH_PLAYER_ERROR_MESSAGE = "I asked you to give me the name of the next player !";
@@ -592,15 +593,13 @@ const ClubsIntentHandler = {
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
         if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
-            sessionAttributes.currentPlayer = 0
-            sentence = sentence + "Thanks for playing red or black";
+            sentence = sentence + RESTART_MESSAGE;
         } else {
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
         }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
             .speak(sentence)
-            .reprompt()
             .getResponse();
     }
 };
@@ -632,15 +631,13 @@ const SpadesIntentHandler = {
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
         if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
-            sessionAttributes.currentPlayer = 0
-            sentence = sentence + "Thanks for playing red or black";
+            sentence = sentence + RESTART_MESSAGE;
         } else {
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
         }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
             .speak(sentence)
-            .reprompt()
             .getResponse();
     }
 };
@@ -672,15 +669,13 @@ const HeartsIntentHandler = {
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
         if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
-            sessionAttributes.currentPlayer = 0
-            sentence = sentence + "Thanks for playing red or black";
+            sentence = sentence + RESTART_MESSAGE;
         } else {
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
         }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
             .speak(sentence)
-            .reprompt()
             .getResponse();
     }
 };
@@ -712,15 +707,13 @@ const DiamondsIntentHandler = {
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
         if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
-            sessionAttributes.currentPlayer = 0
-            sentence = sentence + "Thanks for playing red or black";
+            sentence = sentence + RESTART_MESSAGE;
         } else {
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
         }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
             .speak(sentence)
-            .reprompt()
             .getResponse();
     }
 };
