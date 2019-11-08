@@ -94,28 +94,32 @@
         "name": "ClubsIntent",
         "slots": [],
         "samples": [
-            "club"
+            "club",
+            "clubs"
         ]
         },
         {
         "name": "DiamondsIntent",
         "slots": [],
         "samples": [
-            "diamond"
+            "diamond",
+            "diamonds"
         ]
         },  
         {
         "name": "HeartsIntent",
         "slots": [],
         "samples": [
-            "heart"
+            "heart",
+            "hearts"
         ]
         },  
         {
         "name": "SpadesIntent",
         "slots": [],
         "samples": [
-            "spade"
+            "spade",
+            "spades"
         ]
         },          
         {

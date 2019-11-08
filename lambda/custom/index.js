@@ -23,7 +23,7 @@ const PHASE_ERROR_MESSAGE = [
     "I asked you, RED OR BLACK !",
     "I asked you, HIGHER or BELOW !",
     "I asked you, IN or OUT !",
-    "I asked you, A SUITE !"
+    "I asked you, A SUIT !"
 ];
 
 const ADD_PLAYER_ERROR_MESSAGE = "You cannot add another player in the game";
@@ -258,7 +258,7 @@ const SetNbPlayerIntentHandler = {
         const sentence = "The game is launched with " + nbPlayers + " players, What\'s the name of the player one ?";
         sessionAttributes.numberOfPlayer = nbPlayers;
         sessionAttributes.playersList = [];
-        sessionAttributes.currentPlayer = 1;
+        sessionAttributes.currentPlayer = 0;
         sessionAttributes.deck = deck
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
@@ -292,8 +292,8 @@ const SetNamePlayerIntentHandler = {
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
 
         if (sessionAttributes.playersList.length >= sessionAttributes.numberOfPlayer) {
-            sessionAttributes.currentPlayer = 1;
-            sentence = "The player name is " + playerName + ". " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! red or black?";
+            sessionAttributes.currentPlayer = 0;
+            sentence = "The player name is " + playerName + ". " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ", red or black ?";
         } else {
             sentence = "The player name is " + playerName + ", What\'s the next player name ?";
         }
@@ -336,10 +336,10 @@ const RedIntentHandler = {
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
         if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
-            sessionAttributes.currentPlayer = 1
-            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + ", higher or below ?";
+            sessionAttributes.currentPlayer = 0
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + ", higher or below ?";
         } else {
-            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! red or black?"
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". red or black ?"
         }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
@@ -380,9 +380,9 @@ const BlackIntentHandler = {
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
         if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
             sessionAttributes.currentPlayer = 0
-            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + ", higher or below ?";
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + ", higher or below ?";
         } else {
-            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + "! red or black?"
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". red or black ?"
         }
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
@@ -392,15 +392,42 @@ const BlackIntentHandler = {
 
     }
 };
-/*
+
 const HigherIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'HigherIntent';
     },
     handle(handlerInput) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        const card = sessionAttributes.deck.pop()
+        var sentence = "You draw a " + card.rank + " of " + card.suit;
+
+        if (cardValue.get(card.rank) > cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank)) {
+            sentence = sentence + ", you won !"
+        } else {
+            sentence = sentence + ", you lost !"
+        }
+
+        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+            sessionAttributes.currentPlayer = 0
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + " and a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank + ", in or out ?";
+        } else {
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". higher or below ?"
+        }
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
-            .speak("")
+            .speak(sentence)
             .reprompt()
             .getResponse();
     }
@@ -412,36 +439,335 @@ const BelowIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'BelowIntent';
     },
     handle(handlerInput) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        const card = sessionAttributes.deck.pop()
+        var sentence = "You draw a " + card.rank + " of " + card.suit;
+
+        if (cardValue.get(card.rank) < cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank)) {
+            sentence = sentence + ", you won !"
+        } else {
+            sentence = sentence + ", you lost !"
+        }
+
+        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+            sessionAttributes.currentPlayer = 0
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + " and a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank + ", in or out ?";
+        } else {
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". higher or below ?"
+        }
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
-            .speak("")
+            .speak(sentence)
             .reprompt()
             .getResponse();
     }
 };
-*/
-/*
-Be careful, you have to order 
-*/
+
+const InternIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'InternIntent';
+    },
+    handle(handlerInput) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        const card = sessionAttributes.deck.pop()
+        var sentence = "You draw a " + card.rank + " of " + card.suit;
+
+        const minimum = Math.min(cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank),
+                                 cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
+
+        const maximum = Math.max(cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank),
+                                 cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
+
+        if (cardValue.get(card.rank) > minimum && cardValue.get(card.rank) < maximum) {
+            sentence = sentence + ", you won !"
+        } else {
+            sentence = sentence + ", you lost !"
+        }
+
+        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+            sessionAttributes.currentPlayer = 0
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
+        } else {
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + " and a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank + ", in or out ?";
+        }
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return handlerInput.responseBuilder
+            .speak(sentence)
+            .reprompt()
+            .getResponse();
+    }
+};
+
+const ExternIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ExternIntent';
+    },
+    handle(handlerInput) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        const card = sessionAttributes.deck.pop()
+        var sentence = "You draw a " + card.rank + " of " + card.suit;
+
+        const minimum = Math.min(cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank),
+                                 cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
+
+        const maximum = Math.max(cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank),
+                                 cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
+
+        if (cardValue.get(card.rank) < minimum || cardValue.get(card.rank) > maximum) {
+            sentence = sentence + ", you won !"
+        } else {
+            sentence = sentence + ", you lost !"
+        }
+
+        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+            sessionAttributes.currentPlayer = 0
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
+        } else {
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + " and a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank + ", in or out ?";
+        }
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return handlerInput.responseBuilder
+            .speak(sentence)
+            .reprompt()
+            .getResponse();
+    }
+};
+
+const ClubsIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ClubsIntent';
+    },
+    handle(handlerInput) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        const card = sessionAttributes.deck.pop()
+        var sentence = "You draw a " + card.rank + " of " + card.suit;
+
+        if (card.suit == "clubs") {
+            sentence = sentence + ", you won !"
+        } else {
+            sentence = sentence + ", you lost !"
+        }
+
+        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+            sessionAttributes.currentPlayer = 0
+            sentence = sentence + "Thanks for playing red or black";
+        } else {
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
+        }
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return handlerInput.responseBuilder
+            .speak(sentence)
+            .reprompt()
+            .getResponse();
+    }
+};
+
+const SpadesIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SpadesIntent';
+    },
+    handle(handlerInput) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        const card = sessionAttributes.deck.pop()
+        var sentence = "You draw a " + card.rank + " of " + card.suit;
+
+        if (card.suit == "spades") {
+            sentence = sentence + ", you won !"
+        } else {
+            sentence = sentence + ", you lost !"
+        }
+
+        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+            sessionAttributes.currentPlayer = 0
+            sentence = sentence + "Thanks for playing red or black";
+        } else {
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
+        }
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return handlerInput.responseBuilder
+            .speak(sentence)
+            .reprompt()
+            .getResponse();
+    }
+};
+
+const HeartsIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'HeartsIntent';
+    },
+    handle(handlerInput) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        const card = sessionAttributes.deck.pop()
+        var sentence = "You draw a " + card.rank + " of " + card.suit;
+
+        if (card.suit == "hearts") {
+            sentence = sentence + ", you won !"
+        } else {
+            sentence = sentence + ", you lost !"
+        }
+
+        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+            sessionAttributes.currentPlayer = 0
+            sentence = sentence + "Thanks for playing red or black";
+        } else {
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
+        }
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return handlerInput.responseBuilder
+            .speak(sentence)
+            .reprompt()
+            .getResponse();
+    }
+};
+
+const DiamondsIntentHandler = {
+    canHandle(handlerInput) {
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'DiamondsIntent';
+    },
+    handle(handlerInput) {
+        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if(!verif){
+            return handlerInput.responseBuilder
+                .speak(errorMessage)
+                .reprompt()
+                .getResponse();
+        }
+
+        const card = sessionAttributes.deck.pop()
+        var sentence = "You draw a " + card.rank + " of " + card.suit;
+
+        if (card.suit == "diamonds") {
+            sentence = sentence + ", you won !"
+        } else {
+            sentence = sentence + ", you lost !"
+        }
+
+        sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
+        sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+            sessionAttributes.currentPlayer = 0
+            sentence = sentence + "Thanks for playing red or black";
+        } else {
+            sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
+        }
+        handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+        return handlerInput.responseBuilder
+            .speak(sentence)
+            .reprompt()
+            .getResponse();
+    }
+};
 
 function verifIntent(session, intent, parameter = undefined) {
     const checkInPhase = (session.numberOfPlayer && session.playersList.length == session.numberOfPlayer)
 
     if (colorIntents.includes(intent)) {
-        if (checkInPhase && session.playersList[session.currentPlayer].cards.length == 0) {
-            return { verif: true, errorMessage: "" }
+        if (checkInPhase && session.playersList[session.currentPlayer].cards.length != 0) {
+            return { verif: false, errorMessage: PHASE_ERROR_MESSAGE[session.playersList[session.currentPlayer].cards.length] }
         } else if (!session.numberOfPlayer) {
             return { verif: false, errorMessage: NB_PLAYER_WRONG_ERROR_MESSAGE }
         } else if (session.numberOfPlayer && session.playersList.length < session.numberOfPlayer) {
             return { verif: false, errorMessage: NOT_ENOUGH_PLAYER_ERROR_MESSAGE }
         } else {
-            return { verif: false, errorMessage: PHASE_ERROR_MESSAGE }
+            return { verif: true, errorMessage: "" }
         }
     } else if (compareIntents.includes(intent)) {
-        return { verif: true, errorMessage: "" }
+        if (checkInPhase && session.playersList[session.currentPlayer].cards.length != 1) {
+            return { verif: false, errorMessage: PHASE_ERROR_MESSAGE[session.playersList[session.currentPlayer].cards.length] }
+        } else if (!session.numberOfPlayer) {
+            return { verif: false, errorMessage: NB_PLAYER_WRONG_ERROR_MESSAGE }
+        } else if (session.numberOfPlayer && session.playersList.length < session.numberOfPlayer) {
+            return { verif: false, errorMessage: NOT_ENOUGH_PLAYER_ERROR_MESSAGE }
+        } else {
+            return { verif: true, errorMessage: "" }
+        }
     } else if (interExterIntents.includes(intent)) {
-        return { verif: true, errorMessage: "" }
+        if (checkInPhase && session.playersList[session.currentPlayer].cards.length != 2) {
+            return { verif: false, errorMessage: PHASE_ERROR_MESSAGE[session.playersList[session.currentPlayer].cards.length] }
+        } else if (!session.numberOfPlayer) {
+            return { verif: false, errorMessage: NB_PLAYER_WRONG_ERROR_MESSAGE }
+        } else if (session.numberOfPlayer && session.playersList.length < session.numberOfPlayer) {
+            return { verif: false, errorMessage: NOT_ENOUGH_PLAYER_ERROR_MESSAGE }
+        } else {
+            return { verif: true, errorMessage: "" }
+        }
     } else if (suiteIntents.includes(intent)) {
-        return { verif: true, errorMessage: "" }
+        if (checkInPhase && session.playersList[session.currentPlayer].cards.length != 3) {
+            return { verif: false, errorMessage: PHASE_ERROR_MESSAGE[session.playersList[session.currentPlayer].cards.length] }
+        } else if (!session.numberOfPlayer) {
+            return { verif: false, errorMessage: NB_PLAYER_WRONG_ERROR_MESSAGE }
+        } else if (session.numberOfPlayer && session.playersList.length < session.numberOfPlayer) {
+            return { verif: false, errorMessage: NOT_ENOUGH_PLAYER_ERROR_MESSAGE }
+        } else {
+            return { verif: true, errorMessage: "" }
+        }
     } else if (intent == "SetNbPlayerIntent") {
         if (session.numberOfPlayer) {
             return { verif: false, errorMessage: NB_PLAYER_ERROR_MESSAGE + " to " + session.numberOfPlayer }
@@ -470,6 +796,14 @@ exports.handler = Alexa.SkillBuilders.custom()
         SetNamePlayerIntentHandler,
         RedIntentHandler,
         BlackIntentHandler,
+        HigherIntentHandler,
+        BelowIntentHandler,
+        InternIntentHandler,
+        ExternIntentHandler,
+        ClubsIntentHandler,
+        SpadesIntentHandler,
+        HeartsIntentHandler,
+        DiamondsIntentHandler,
         HelpIntentHandler,
         CancelAndStopIntentHandler,
         FallbackIntentHandler,
