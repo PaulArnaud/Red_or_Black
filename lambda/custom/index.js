@@ -364,7 +364,7 @@ const RedIntentHandler = {
 const BlackIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' 
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'RedIntent';
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'BlackIntent';
     },
     handle(handlerInput) {
         const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
