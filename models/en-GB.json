@@ -46,14 +46,14 @@
         "name": "RedIntent",
         "slots": [],
         "samples": [
-            "red"
+            "red card"
         ]
         },
         {
         "name": "BlackIntent",
         "slots": [],
         "samples": [
-            "black"
+            "black card"
         ]
         },
         {
@@ -94,7 +94,7 @@
         "name": "ClubsIntent",
         "slots": [],
         "samples": [
-            "club",
+            "club card",
             "clubs"
         ]
         },
@@ -102,7 +102,7 @@
         "name": "DiamondsIntent",
         "slots": [],
         "samples": [
-            "diamond",
+            "diamond card",
             "diamonds"
         ]
         },  
@@ -110,7 +110,7 @@
         "name": "HeartsIntent",
         "slots": [],
         "samples": [
-            "heart",
+            "heart card",
             "hearts"
         ]
         },  
@@ -118,7 +118,7 @@
         "name": "SpadesIntent",
         "slots": [],
         "samples": [
-            "spade",
+            "spade card",
             "spades"
         ]
         },          

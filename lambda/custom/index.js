@@ -14,20 +14,32 @@ const compareIntents = ["HigherIntent", "BelowIntent"];
 const interExterIntents = ["InternIntent", "ExternIntent"];
 const suiteIntents = ["DiamondsIntent", "ClubsIntent", "SpadesIntent", "HeartsIntent"];
 
-const RESTART_MESSAGE = " Thanks for playing to red or black, Good Bye";
-const WELCOME_MESSAGE = "Welcome in Red or Black! Please play moderatly to this game. How many player do you want ?";
-const NB_PLAYER_ERROR_MESSAGE = "The number of players has already been set";
-const NB_PLAYER_WRONG_ERROR_MESSAGE = "Please set a number of players between 1 and 13";
-const NOT_ENOUGH_PLAYER_ERROR_MESSAGE = "I asked you to give me the name of the next player !";
+const RESTART_MESSAGE = "Thanks for playing to red or black, Good Bye ";
+const WELCOME_MESSAGE = "Welcome in Red or Black! Please play moderatly to this game. How many player do you want ? ";
+const NB_PLAYER_ERROR_MESSAGE = "The number of players has already been set ";
+const NB_PLAYER_WRONG_ERROR_MESSAGE = "Please set a number of players between 1 and 13 ";
+const NOT_ENOUGH_PLAYER_ERROR_MESSAGE = "I asked you to give me the name of the next player ! ";
+
+const WIN_MESSAGE = "You win ! ";
+const LOSS_MESSAGE = "You lost ! ";
+
+const GAME_LAUNCHED_MESSAGE = "The game is launched with NUMBER_OF_PLAYER players. ";
+const FIRST_PLAYER_NAME_QUESTION_MESSAGE = "What\'s the name of the player one ? ";
+const PLAYER_NAME_QUESTION_MESSAGE = "What\'s the name of the next player ? ";
+const PLAYER_NAME_MESSAGE = "The player name is PLAYER_NAME . ";
+const RED_OR_BLACK_QUESTION_MESSAGE = "red or black ? ";
+const HIGHER_OR_BELOW_MESSAGE = "higher or below ? ";
+
+const CARD_MESSAGE = "You ACTION a RANK of SUIT . ";
 
 const PHASE_ERROR_MESSAGE = [
-    "I asked you, RED OR BLACK !",
-    "I asked you, HIGHER or BELOW !",
-    "I asked you, IN or OUT !",
-    "I asked you, A SUIT !"
+    "I asked you, RED OR BLACK ! ",
+    "I asked you, HIGHER or BELOW ! ",
+    "I asked you, IN or OUT ! ",
+    "I asked you, A SUIT ! "
 ];
 
-const ADD_PLAYER_ERROR_MESSAGE = "You cannot add another player in the game";
+const ADD_PLAYER_ERROR_MESSAGE = "You cannot add another player in the game ";
 
 const cardValue = new Map([
     ["ace", 1],
@@ -256,15 +268,18 @@ const SetNbPlayerIntentHandler = {
 
         var deck = DECK_52;
         deck.sort(function (a, b) { return 0.5 - Math.random() })
-        const sentence = "The game is launched with " + nbPlayers + " players, What\'s the name of the player one ?";
+
         sessionAttributes.numberOfPlayer = nbPlayers;
         sessionAttributes.playersList = [];
         sessionAttributes.currentPlayer = 0;
         sessionAttributes.deck = deck
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
+
+        const startMessage = GAME_LAUNCHED_MESSAGE.replace("NUMBER_OF_PLAYER", nbPlayers);
+        const questionMessage = FIRST_PLAYER_NAME_QUESTION_MESSAGE;
         return handlerInput.responseBuilder
-            .speak(sentence)
-            .reprompt("What\'s the first player name ?")
+            .speak(startMessage + questionMessage)
+            .reprompt()
             .getResponse();
     }
 };
@@ -276,7 +291,7 @@ const SetNamePlayerIntentHandler = {
     },
     handle(handlerInput) {
         const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let { verif, errorMessage } = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        let { verif, errorMessage } = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope));
         if (!verif) {
             return handlerInput.responseBuilder
                 .speak(errorMessage)
@@ -286,27 +301,25 @@ const SetNamePlayerIntentHandler = {
 
         const playerName = handlerInput.requestEnvelope.request.intent.slots.name.value;
 
-        var sentence = "";
-
+        var nameSentence = PLAYER_NAME_MESSAGE.replace("PLAYER_NAME", playerName);
+        var sentence = PLAYER_NAME_QUESTION_MESSAGE;
 
         sessionAttributes.playersList.push({ key: sessionAttributes.currentPlayer, name: playerName, cards: [] });
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
 
         if (sessionAttributes.playersList.length >= sessionAttributes.numberOfPlayer) {
             sessionAttributes.currentPlayer = 0;
-            sentence = "The player name is " + playerName + ". " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ", red or black ?";
-        } else {
-            sentence = "The player name is " + playerName + ", What\'s the next player name ?";
+            sentence = sessionAttributes.playersList[sessionAttributes.currentPlayer].name + " " + RED_OR_BLACK_QUESTION_MESSAGE;
         }
 
         handlerInput.attributesManager.setSessionAttributes(sessionAttributes);
         return handlerInput.responseBuilder
-            .speak(sentence)
-            .reprompt("What\'s the player name ?")
+            .speak(nameSentence + sentence)
+            .reprompt(PLAYER_NAME_QUESTION_MESSAGE)
             .getResponse();
-
     }
 };
+
 
 const RedIntentHandler = {
     canHandle(handlerInput) {
@@ -324,14 +337,12 @@ const RedIntentHandler = {
         }
 
         const card = sessionAttributes.deck.pop()
-        const suit = card.suit
-        const rank = card.rank
-        var sentence = "You draw a " + rank + " of " + suit;
-        
-        if (suit == "hearts" || suit == "diamonds"){
-            sentence = sentence + ", you won !"
+        var sentence = CARD_MESSAGE.replace("ACTION", "draw").replace("RANK", card.rank).replace("SUIT", card.suit);
+
+        if (card.suit == "hearts" || card.suit == "diamonds"){
+            sentence = sentence + " you win ! ";
         } else {
-            sentence = sentence + ", you lost !"
+            sentence = sentence +  " you lost ! ";
         }
 
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
@@ -347,14 +358,13 @@ const RedIntentHandler = {
             .speak(sentence)
             .reprompt()
             .getResponse();
-
     }
 };
 
 const BlackIntentHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest' 
-            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'BlackIntent';
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'RedIntent';
     },
     handle(handlerInput) {
         const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
@@ -367,14 +377,12 @@ const BlackIntentHandler = {
         }
 
         const card = sessionAttributes.deck.pop()
-        const suit = card.suit
-        const rank = card.rank
-        var sentence = "You draw a " + rank + " of " + suit;
-        
-        if (suit == "spades" || suit == "clubs"){
-            sentence = sentence + ", you won !"
+        var sentence = CARD_MESSAGE.replace("ACTION", "draw").replace("RANK", card.rank).replace("SUIT", card.suit);
+
+        if (card.suit == "spades" || card.suit == "clubs"){
+            sentence = sentence + " you win ! ";
         } else {
-            sentence = sentence + ", you lost !"
+            sentence = sentence +  " you lost ! ";
         }
 
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
@@ -390,7 +398,6 @@ const BlackIntentHandler = {
             .speak(sentence)
             .reprompt()
             .getResponse();
-
     }
 };
 
@@ -400,9 +407,9 @@ const HigherIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'HigherIntent';
     },
     handle(handlerInput) {
-        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
-        if(!verif){
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let { verif, errorMessage } = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if (!verif) {
             return handlerInput.responseBuilder
                 .speak(errorMessage)
                 .reprompt()
@@ -420,7 +427,7 @@ const HigherIntentHandler = {
 
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
-        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length) {
             sessionAttributes.currentPlayer = 0
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + " and a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank + ", in or out ?";
         } else {
@@ -440,9 +447,9 @@ const BelowIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'BelowIntent';
     },
     handle(handlerInput) {
-        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
-        if(!verif){
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let { verif, errorMessage } = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if (!verif) {
             return handlerInput.responseBuilder
                 .speak(errorMessage)
                 .reprompt()
@@ -460,7 +467,7 @@ const BelowIntentHandler = {
 
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
-        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length) {
             sessionAttributes.currentPlayer = 0
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". you have a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank + " and a " + sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank + ", in or out ?";
         } else {
@@ -480,9 +487,9 @@ const InternIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'InternIntent';
     },
     handle(handlerInput) {
-        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
-        if(!verif){
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let { verif, errorMessage } = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if (!verif) {
             return handlerInput.responseBuilder
                 .speak(errorMessage)
                 .reprompt()
@@ -493,10 +500,10 @@ const InternIntentHandler = {
         var sentence = "You draw a " + card.rank + " of " + card.suit;
 
         const minimum = Math.min(cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank),
-                                 cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
+            cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
 
         const maximum = Math.max(cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank),
-                                 cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
+            cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
 
         if (cardValue.get(card.rank) > minimum && cardValue.get(card.rank) < maximum) {
             sentence = sentence + ", you won !"
@@ -506,7 +513,7 @@ const InternIntentHandler = {
 
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
-        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length) {
             sessionAttributes.currentPlayer = 0
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
         } else {
@@ -526,9 +533,9 @@ const ExternIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ExternIntent';
     },
     handle(handlerInput) {
-        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
-        if(!verif){
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let { verif, errorMessage } = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if (!verif) {
             return handlerInput.responseBuilder
                 .speak(errorMessage)
                 .reprompt()
@@ -539,10 +546,10 @@ const ExternIntentHandler = {
         var sentence = "You draw a " + card.rank + " of " + card.suit;
 
         const minimum = Math.min(cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank),
-                                 cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
+            cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
 
         const maximum = Math.max(cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[0].rank),
-                                 cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
+            cardValue.get(sessionAttributes.playersList[sessionAttributes.currentPlayer].cards[1].rank))
 
         if (cardValue.get(card.rank) < minimum || cardValue.get(card.rank) > maximum) {
             sentence = sentence + ", you won !"
@@ -552,7 +559,7 @@ const ExternIntentHandler = {
 
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
-        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length) {
             sessionAttributes.currentPlayer = 0
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
         } else {
@@ -572,9 +579,9 @@ const ClubsIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'ClubsIntent';
     },
     handle(handlerInput) {
-        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
-        if(!verif){
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let { verif, errorMessage } = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if (!verif) {
             return handlerInput.responseBuilder
                 .speak(errorMessage)
                 .reprompt()
@@ -592,7 +599,7 @@ const ClubsIntentHandler = {
 
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
-        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length) {
             sentence = sentence + RESTART_MESSAGE;
         } else {
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
@@ -610,9 +617,9 @@ const SpadesIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'SpadesIntent';
     },
     handle(handlerInput) {
-        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
-        if(!verif){
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let { verif, errorMessage } = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if (!verif) {
             return handlerInput.responseBuilder
                 .speak(errorMessage)
                 .reprompt()
@@ -630,7 +637,7 @@ const SpadesIntentHandler = {
 
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
-        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length) {
             sentence = sentence + RESTART_MESSAGE;
         } else {
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
@@ -648,9 +655,9 @@ const HeartsIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'HeartsIntent';
     },
     handle(handlerInput) {
-        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
-        if(!verif){
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let { verif, errorMessage } = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if (!verif) {
             return handlerInput.responseBuilder
                 .speak(errorMessage)
                 .reprompt()
@@ -668,7 +675,7 @@ const HeartsIntentHandler = {
 
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
-        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length) {
             sentence = sentence + RESTART_MESSAGE;
         } else {
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
@@ -686,9 +693,9 @@ const DiamondsIntentHandler = {
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'DiamondsIntent';
     },
     handle(handlerInput) {
-        const  sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
-        let {verif, errorMessage} = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
-        if(!verif){
+        const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+        let { verif, errorMessage } = verifIntent(sessionAttributes, Alexa.getIntentName(handlerInput.requestEnvelope))
+        if (!verif) {
             return handlerInput.responseBuilder
                 .speak(errorMessage)
                 .reprompt()
@@ -706,7 +713,7 @@ const DiamondsIntentHandler = {
 
         sessionAttributes.playersList[sessionAttributes.currentPlayer].cards.push(card)
         sessionAttributes.currentPlayer = sessionAttributes.currentPlayer + 1;
-        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length){
+        if (sessionAttributes.currentPlayer == sessionAttributes.playersList.length) {
             sentence = sentence + RESTART_MESSAGE;
         } else {
             sentence = sentence + " " + sessionAttributes.playersList[sessionAttributes.currentPlayer].name + ". Which suit ?";
